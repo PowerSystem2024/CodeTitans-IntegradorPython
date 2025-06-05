@@ -16,8 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+#si hacemos una comparacion con NodeJS, seria como el "server.js"
+#la diferencia es que en NodeJS se usa el archivo "server.js" para definir la ruta de la API
+#y en Django se usa el archivo "urls.py" para definir la ruta de la API
+#el archivo "urls.py" es el encargado de manejar las peticiones y respuestas de la API
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('servic.urls')),
 ]
+
+# Servir archivos media en desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
