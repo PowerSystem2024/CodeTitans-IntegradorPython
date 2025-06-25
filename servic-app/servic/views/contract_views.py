@@ -13,7 +13,12 @@ from ..serializers.contract_serializers import (
     ServiceContractReviewSerializer,
     ServiceContractRejectSerializer,
 )
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(
+    summary="Crear contrato de servicio",
+    description="Permite a un cliente crear un contrato de servicio con un proveedor."
+)
 
 class ServiceContractCreateView(generics.CreateAPIView):
     serializer_class = ServiceContractCreateSerializer
@@ -33,6 +38,10 @@ class ServiceContractCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(client=self.request.user)
 
+@extend_schema(
+    summary="Listar contratos de servicio",
+    description="Lista todos los contratos donde el usuario es cliente o proveedor."
+)
 
 class ServiceContractListView(generics.ListAPIView):
     serializer_class = ServiceContractSerializer
@@ -42,11 +51,15 @@ class ServiceContractListView(generics.ListAPIView):
         user = self.request.user
         return ServiceContract.objects.filter(Q(client=user) | Q(provider=user))
 
+@extend_schema(
+    summary="Detalle y actualización de contrato de servicio",
+    description="Permite ver o actualizar un contrato de servicio."
+)
 
 class ServiceContractDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = ServiceContractSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+     
     def get_queryset(self):
         user = self.request.user
         return ServiceContract.objects.filter(Q(client=user) | Q(provider=user))
@@ -63,6 +76,10 @@ class ServiceContractDetailView(generics.RetrieveUpdateAPIView):
         self.perform_update(serializer)
         return Response(ServiceContractSerializer(instance).data)
 
+@extend_schema(
+    summary="Revisar contrato de servicio",
+    description="Permite a las partes dejar una reseña sobre el contrato."
+)
 
 class ServiceContractReviewView(generics.UpdateAPIView):
     serializer_class = ServiceContractReviewSerializer
@@ -80,7 +97,14 @@ class ServiceContractReviewView(generics.UpdateAPIView):
         return Response(ServiceContractSerializer(instance).data)
 
 
+
 # para que el prestador pueda aceptar solicitudes
+
+@extend_schema(
+    summary="Aceptar contrato de servicio",
+    description="Permite al proveedor aceptar una solicitud de contrato."
+)
+
 class ServiceContractAcceptView(generics.UpdateAPIView):
     serializer_class = ServiceContractUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -98,6 +122,12 @@ class ServiceContractAcceptView(generics.UpdateAPIView):
 
 
 # para que el prestador pueda rechazar solicitudes con un motivo
+
+@extend_schema(
+    summary="Rechazar contrato de servicio",
+    description="Permite al proveedor rechazar una solicitud de contrato con motivo."
+)
+
 class ServiceContractRejectView(generics.UpdateAPIView):
     serializer_class = ServiceContractRejectSerializer
     permission_classes = [permissions.IsAuthenticated]

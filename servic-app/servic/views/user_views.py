@@ -7,7 +7,12 @@ from ..serializers import (
     UserRoleChangeSerializer,
     ChangePasswordSerializer,
 )
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(
+    summary="Perfil de usuario",
+    description="Permite consultar y actualizar los datos del perfil del usuario autenticado."
+)
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
@@ -15,8 +20,21 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+    
+    @extend_schema(
+        summary="Actualizar perfil de usuario (PUT)",
+        description="Actualiza completamente todos los datos del perfil del usuario autenticado. Se deben enviar todos los campos requeridos."
+    )
+    def put(self, request, *args, **kwargs):
+        return super().put(request, *args, **kwargs)
 
-
+    @extend_schema(
+        summary="Actualizar parcialmente el perfil de usuario (PATCH)",
+        description="Actualiza parcialmente los datos del perfil del usuario autenticado. Solo se deben enviar los campos que se desean modificar."
+    )
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+    
 class UserRoleChangeView(generics.UpdateAPIView):
     serializer_class = UserRoleChangeSerializer
     permission_classes = [permissions.IsAdminUser]
@@ -57,6 +75,11 @@ class UserRoleChangeView(generics.UpdateAPIView):
 
 
 # Vista para cambiar la contraseña del usuario
+@extend_schema(
+    summary="Cambiar contraseña",
+    description="Permite al usuario autenticado cambiar su contraseña actual por una nueva."
+)
+
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
     permission_classes = [permissions.IsAuthenticated]

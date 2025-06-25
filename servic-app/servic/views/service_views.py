@@ -11,7 +11,12 @@ from ..serializers import (
     ServiceImageSerializer,
 )
 from ..permissions import IsProviderAndVerified
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(
+    summary="Listar y crear categorías de servicio",
+    description="Permite listar todas las categorías de servicio o crear una nueva (solo para usuarios autenticados)."
+)
 
 class ServiceCategoryListView(generics.ListCreateAPIView):
     queryset = ServiceCategory.objects.all()
@@ -20,12 +25,20 @@ class ServiceCategoryListView(generics.ListCreateAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ["name", "description"]
 
+@extend_schema(
+    summary="Detalle, actualización y eliminación de categoría de servicio",
+    description="Permite ver, actualizar o eliminar una categoría de servicio."
+)
 
 class ServiceCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ServiceCategory.objects.all()
     serializer_class = ServiceCategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+@extend_schema(
+    summary="Crear un servicio",
+    description="Permite a un proveedor crear un nuevo servicio."
+)
 
 class ServiceCreateView(generics.CreateAPIView):
     serializer_class = ServiceSerializer
@@ -35,6 +48,10 @@ class ServiceCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(provider=self.request.user)
 
+@extend_schema(
+    summary="Listar servicios",
+    description="Permite listar todos los servicios activos con filtros y búsqueda."
+)
 
 class ServiceListView(generics.ListAPIView):
     serializer_class = ServiceListSerializer
@@ -67,6 +84,10 @@ class ServiceListView(generics.ListAPIView):
 
         return queryset
 
+@extend_schema(
+    summary="Detalle, actualización y eliminación de servicio",
+    description="Permite ver, actualizar o eliminar un servicio específico."
+)
 
 class ServiceDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ServiceSerializer
@@ -90,6 +111,10 @@ class ServiceDetailView(generics.RetrieveUpdateDestroyAPIView):
                 )
         return super().check_object_permissions(request, obj)
 
+@extend_schema(
+    summary="Subir imagen de servicio",
+    description="Permite a un proveedor subir una imagen para uno de sus servicios. Si es la primera imagen, se marca como principal."
+)
 
 class ServiceImageUploadView(generics.CreateAPIView):
     serializer_class = ServiceImageSerializer
@@ -109,6 +134,10 @@ class ServiceImageUploadView(generics.CreateAPIView):
         else:
             serializer.save(service=service)
 
+@extend_schema(
+    summary="Eliminar imagen de servicio",
+    description="Permite a un proveedor eliminar una imagen de uno de sus servicios. Si la imagen era principal, otra imagen será marcada como principal."
+)
 
 class ServiceImageDeleteView(generics.DestroyAPIView):
     serializer_class = ServiceImageSerializer
@@ -126,6 +155,10 @@ class ServiceImageDeleteView(generics.DestroyAPIView):
                 next_image.save()
         instance.delete()
 
+@extend_schema(
+    summary="Marcar imagen como principal",
+    description="Permite a un proveedor marcar una imagen específica como la principal de su servicio."
+)
 
 class ServiceImageSetPrimaryView(generics.UpdateAPIView):
     serializer_class = ServiceImageSerializer

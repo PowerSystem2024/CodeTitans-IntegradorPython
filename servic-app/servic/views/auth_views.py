@@ -14,12 +14,17 @@ from ..serializers import (
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
 )
+from drf_spectacular.utils import extend_schema
 
 
 # Aqui definimos la logica de la API similar al archivo "usersController.js"
 # Creamos las funciones que vamos a usar en la API
 # Crear un usuario
 
+@extend_schema(
+    summary="Registro de usuario",
+    description="Permite registrar un nuevo usuario en el sistema."
+)
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
@@ -50,12 +55,22 @@ class RegisterView(generics.CreateAPIView):
 
 # Loguear un usuario
 
+@extend_schema(
+    summary="Inicio de sesión",
+    description="Permite a un usuario autenticarse y obtener un token JWT."
+)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
 # Cerrar sesión de un usuario
+
+@extend_schema(
+    summary="Cerrar sesión",
+    description="Permite a un usuario cerrar sesión y revocar su token."
+)
+
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -79,6 +94,12 @@ class LogoutView(APIView):
 
 
 # Recuperar contraseña - Solicitud
+
+@extend_schema(
+    summary="Solicitar restablecimiento de contraseña",
+    description="Envía un correo electrónico al usuario con instrucciones para restablecer su contraseña."
+)
+
 class PasswordResetRequestView(APIView):
     permission_classes = []
 
@@ -95,6 +116,11 @@ class PasswordResetRequestView(APIView):
 
 
 # Recuperar contraseña - Confirmación
+
+@extend_schema(
+    summary="Confirmar restablecimiento de contraseña",
+    description="Permite al usuario establecer una nueva contraseña utilizando el token recibido por correo electrónico."
+)
 class PasswordResetConfirmView(APIView):
     permission_classes = []
 
