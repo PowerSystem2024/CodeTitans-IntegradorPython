@@ -6,6 +6,7 @@ from ..models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
+from ..models import ProviderRequest
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -72,12 +73,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    admin_response = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ("id", "email", "first_name", "last_name", "user_type")
+        fields = ("id", "email", "first_name", "last_name", "user_type", "admin_response")
         read_only_fields = ("email", "user_type")
 
-
+    def get_admin_response(self, obj):
+        # Trae la última solicitud de proveedor del usuario (si existe)
+        last_request = ProviderRequest.objects.filter(user=obj).order_by('-created_at').first()
+        if last_request:
+            return last_request.admin_response
+        return None
+    
 class UserRoleChangeSerializer(serializers.ModelSerializer):
     user_type = serializers.ChoiceField(
         choices=User.USER_TYPE_CHOICES,

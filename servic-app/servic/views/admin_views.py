@@ -10,9 +10,15 @@ from ..serializers import (
     ServiceSerializer,
     ServiceListSerializer,
 )
+from drf_spectacular.utils import extend_schema
+
 
 User = get_user_model()
 
+@extend_schema(
+    summary="Dashboard de administrador",
+    description="Muestra información general y estadísticas para el administrador."
+)
 
 class AdminDashboardView(APIView):
     """Vista del dashboard administrativo con estadísticas"""
@@ -34,6 +40,10 @@ class AdminDashboardView(APIView):
         }
         return Response(stats)
 
+@extend_schema(
+    summary="Listar prestadores de servicios",
+    description="Permite al administrador ver la lista de todos los prestadores de servicios registrados en el sistema. Se pueden aplicar filtros opcionales como el estado de verificación."
+)
 
 class AdminProviderListView(generics.ListAPIView):
     """Listar todos los prestadores para admin"""
@@ -73,6 +83,11 @@ class AdminProviderVerificationView(APIView):
 
     permission_classes = [permissions.IsAdminUser]
 
+    @extend_schema(
+    summary="Ver informacion completa del prestador",
+    description="Permite al administrador mediante un el numero de id ver la información completa de un prestador."
+    )
+
     def get(self, request, user_id):
         """Ver información completa del prestador"""
         user = get_object_or_404(User, id=user_id, user_type="provider")
@@ -98,6 +113,11 @@ class AdminProviderVerificationView(APIView):
                 {"detail": "Este usuario no tiene un perfil de prestador"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+    @extend_schema(
+    summary="Verificar o desverificar prestador",
+    description="Permite al administrador ver la información completa de un prestador y cambiar su estado de verificación. Se puede agregar una nota administrativa y registrar quién realizó la verificación."
+    )
 
     def put(self, request, user_id):
         """Verificar/desverificar prestador"""
@@ -142,6 +162,10 @@ class AdminProviderVerificationView(APIView):
             {"message": f"Prestador {action} exitosamente", "profile": serializer.data}
         )
 
+@extend_schema(
+    summary="Listar servicios para aprobación",
+    description="Permite al administrador ver la lista de servicios registrados en el sistema, con la opción de filtrar por estado (pendiente, activo, inactivo) para su revisión y aprobación."
+)
 
 class AdminServiceListView(generics.ListAPIView):
     """Listar servicios para aprobación admin"""
@@ -159,6 +183,11 @@ class AdminServiceListView(generics.ListAPIView):
 
         return queryset.order_by("-created_at")
 
+
+@extend_schema(
+    summary="Aprobar servicio",
+    description="Permite al administrador aprobar un servicio por su ID."
+)
 
 class AdminServiceApprovalView(APIView):
     """Aprobar/rechazar servicios"""
