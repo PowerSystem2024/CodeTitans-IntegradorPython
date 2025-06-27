@@ -17,15 +17,12 @@ from ..serializers import (
 from drf_spectacular.utils import extend_schema
 
 
-# Aqui definimos la logica de la API similar al archivo "usersController.js"
-# Creamos las funciones que vamos a usar en la API
-# Crear un usuario
-
+# Decorador para documentar las vistas de la API
 @extend_schema(
     summary="Registro de usuario",
-    description="Permite registrar un nuevo usuario en el sistema."
+    description="Permite registrar un nuevo usuario en el sistema.",
 )
-
+# Registrar un usuario
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
 
@@ -53,24 +50,20 @@ class RegisterView(generics.CreateAPIView):
         )
 
 
-# Loguear un usuario
-
 @extend_schema(
     summary="Inicio de sesión",
-    description="Permite a un usuario autenticarse y obtener un token JWT."
+    description="Permite a un usuario autenticarse y obtener un token JWT.",
 )
-
+# Iniciar sesión
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
-# Cerrar sesión de un usuario
-
 @extend_schema(
     summary="Cerrar sesión",
-    description="Permite a un usuario cerrar sesión y revocar su token."
+    description="Permite a un usuario cerrar sesión y revocar su token.",
 )
-
+# Cerrar sesión
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -93,13 +86,11 @@ class LogoutView(APIView):
             )
 
 
-# Recuperar contraseña - Solicitud
-
 @extend_schema(
     summary="Solicitar restablecimiento de contraseña",
-    description="Envía un correo electrónico al usuario con instrucciones para restablecer su contraseña."
+    description="Envía un correo electrónico al usuario con instrucciones para restablecer su contraseña.",
 )
-
+# Recuperar contraseña - Solicitud
 class PasswordResetRequestView(APIView):
     permission_classes = []
 
@@ -115,12 +106,11 @@ class PasswordResetRequestView(APIView):
         return Response(response, status=status.HTTP_200_OK)
 
 
-# Recuperar contraseña - Confirmación
-
 @extend_schema(
     summary="Confirmar restablecimiento de contraseña",
-    description="Permite al usuario establecer una nueva contraseña utilizando el token recibido por correo electrónico."
+    description="Permite al usuario establecer una nueva contraseña utilizando el token recibido por correo electrónico.",
 )
+# Recuperar contraseña - Confirmación
 class PasswordResetConfirmView(APIView):
     permission_classes = []
 
