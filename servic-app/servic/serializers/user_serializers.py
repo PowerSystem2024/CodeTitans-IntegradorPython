@@ -9,6 +9,7 @@ from django.utils.encoding import force_bytes, force_str
 from ..models import ProviderRequest
 
 
+# Serializer para el registro de usuarios
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
@@ -55,6 +56,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+# Serializer para obtener el token JWT al iniciar sesión
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -72,21 +74,33 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
+# Serializer para el perfil del usuario
 class UserProfileSerializer(serializers.ModelSerializer):
     admin_response = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ("id", "email", "first_name", "last_name", "user_type", "admin_response")
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "user_type",
+            "admin_response",
+        )
         read_only_fields = ("email", "user_type")
 
     def get_admin_response(self, obj):
         # Trae la última solicitud de proveedor del usuario (si existe)
-        last_request = ProviderRequest.objects.filter(user=obj).order_by('-created_at').first()
+        last_request = (
+            ProviderRequest.objects.filter(user=obj).order_by("-created_at").first()
+        )
         if last_request:
             return last_request.admin_response
         return None
-    
+
+
+# Serializer para cambiar el rol de un usuario
 class UserRoleChangeSerializer(serializers.ModelSerializer):
     user_type = serializers.ChoiceField(
         choices=User.USER_TYPE_CHOICES,
@@ -171,6 +185,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         return attrs
 
 
+# Importar el modelo de usuario actual
 UserModel = (
     get_user_model()
 )  # obtenemos el modelo de usuario actual para evitar problemas de importación circular
